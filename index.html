@@ -321,4 +321,19 @@ const beforePreciseIntro=intro;
 intro=function(){beforePreciseIntro();const p=el.querySelector('.panel');if(!p)return;const paras=[...p.querySelectorAll('p')];const welcome=paras.find(x=>/Ton objectif\s*:\s*utiliser/i.test(x.textContent));if(welcome){welcome.textContent='« '+session.first+', bienvenue à '+places[stage][2]+'. Ta mission : relever les défis de cette destination pour récupérer le fragment '+(stage+1)+'. Tu peux utiliser les coups de pouce si tu en as besoin. »'}};
 const beforePreciseAsk=ask;
 ask=function(){beforePreciseAsk();const q=questions[questionIndex],panel=el.querySelector('.panel');if(!q||!panel)return;const help=preciseHelp(q),area=panel.querySelector('.method-support');if(!area)return;const details=area.querySelectorAll('details');if(details[0]){const p=details[0].querySelector('p');if(p)p.textContent=help[0]}if(details[1]){details[1].querySelectorAll('.method-step').forEach((x,i)=>{if(i===0)x.textContent='• '+help[1];else x.remove()});const ps=details[1].querySelectorAll('p');if(ps.length)ps[ps.length-1].textContent=help[2]}};
+</script><script>
+/* Fiabilisation du parcours : aides non révélatrices et reprise de la mission. */
+const beforeReliableIntro=intro;
+intro=function(){beforeReliableIntro();const panel=el.querySelector('.panel');if(!panel)return;const txt=[...panel.querySelectorAll('p')].find(p=>/Le professeur ZEGHOUDI valide ton passage|Chaque question peut demander une méthode différente/.test(p.textContent));if(txt&&/Chaque question/.test(txt.textContent))txt.textContent='Lis chaque question attentivement. Tu peux utiliser un brouillon, une calculatrice et les coups de pouce si nécessaire.'};
+const beforeReliableAsk=ask;
+ask=function(){beforeReliableAsk();const q=questions[questionIndex],panel=el.querySelector('.panel');if(!q||!panel)return;
+if(session){session.currentStage=stage;session.currentQuestion=questionIndex;save()}
+const d=panel.querySelector('.method-support');if(d){const hints=d.querySelectorAll('details');if(hints[1]){const steps=hints[1].querySelectorAll('.method-step');const title=hints[1].querySelector('summary');if(title)title.textContent='📘 Coup de pouce 2 · Comprendre la méthode';const sample=hints[1].querySelectorAll('p');if(sample.length){const last=sample[sample.length-1];const text=last.textContent||'';if(/Un triangle qui possède un angle droit est appelé un triangle rectangle/i.test(text)){last.textContent='Exemple : pour reconnaître un triangle particulier, observe d’abord ses angles et ses côtés.'}}}}
+};
+const beforeReliableComplete=complete;
+complete=function(){if(session){session.currentStage=null;session.currentQuestion=null;save()}beforeReliableComplete();const panel=el.querySelector('.panel');if(panel){const p=[...panel.querySelectorAll('p')].find(x=>/Le professeur ZEGHOUDI valide ton passage/.test(x.textContent));if(p)p.textContent='Bravo '+session.first+' ! Tu as terminé les défis de cette destination.'}};
+const beforeReliableResume=resume;
+resume=function(){if(!session){beforeReliableResume();return}const n=session.currentStage,i=session.currentQuestion;if(Number.isInteger(n)&&Number.isInteger(i)&&n>=0&&n<6&&n<=session.completed){stage=n;questions=makeStage(n);questionIndex=Math.min(Math.max(i,0),questions.length);attempts=0;started=Date.now();ask();return}beforeReliableResume()};
+const beforeReliableNext=next;
+next=function(){beforeReliableNext();if(session&&questionIndex<questions.length){session.currentStage=stage;session.currentQuestion=questionIndex;save()}};
 </script></body></html>
