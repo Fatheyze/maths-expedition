@@ -87,7 +87,7 @@ if(params.get('mission')==='1'){
 /* Banque pédagogique renforcée : 6e et 3e, distincte du générateur historique */
 const EDU={};
 function E(ch,entries,course,figure){EDU[ch]={entries,course,figure:figure||''}}
-const triFig='<div class="figurebox"><svg viewBox="0 0 400 230" xmlns="http://www.w3.org/2000/svg"><path d="M70 185 L320 185 L145 40 Z" fill="#d8f2ee" stroke="#116d7c" stroke-width="3"/><path d="M70 185 L100 185 L100 155" fill="none" stroke="#e28138" stroke-width="3"/><text x="55" y="201">A</text><text x="328" y="195">B</text><text x="140" y="30">C</text><text x="186" y="210">8 cm</text><text x="78" y="99">6 cm</text></svg><small>Schéma de travail : les mesures utiles sont précisées dans chaque énoncé.</small></div>';
+const triFig='<div class="figurebox"><svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Triangle ABC rectangle en A, AB mesure 8 cm, AC mesure 6 cm"><path d="M95 188 L335 188 L95 48 Z" fill="#d8f2ee" stroke="#116d7c" stroke-width="3.5" stroke-linejoin="round"/><path d="M95 165 L118 165 L118 188" fill="none" stroke="#e28138" stroke-width="3"/><text x="76" y="208" fill="#173044" font-size="18">A</text><text x="341" y="194" fill="#173044" font-size="18">B</text><text x="88" y="34" fill="#173044" font-size="18">C</text><text x="195" y="220" fill="#173044" font-size="17">8 cm</text><text x="38" y="122" fill="#173044" font-size="17">6 cm</text></svg><small>Exemple de triangle rectangle en A. Cette figure illustre une propriété : elle ne représente pas nécessairement les données de l’exercice.</small></div>';
 const rectangleFig='<div class="figurebox"><svg viewBox="0 0 400 210"><rect x="65" y="45" width="265" height="120" fill="#d8f2ee" stroke="#116d7c" stroke-width="3"/><text x="180" y="193" fill="#173044">Longueur L</text><text x="15" y="110" fill="#173044">l</text><path d="M65 145 h20 v20" fill="none" stroke="#e28138" stroke-width="3"/></svg><small>Rectangle : longueur L et largeur l.</small></div>';
 E('Triangles et quadrilatères',[
 ['Un triangle possède deux angles de 50° et 60°. Quelle est la mesure du troisième angle ?',70,'La somme des trois angles vaut 180°.','180 − 50 − 60 = 70°','Angles'],
@@ -213,4 +213,23 @@ ask=function(){previousAskScene();const p=el.querySelector('.panel');if(p){p.cla
 const PHOTO_CREDITS=["Paris — Drew Coffman, Wikimedia Commons","Louxor, Karnak — Marc Ryckaert, Wikimedia Commons","Pétra — Wikimedia Commons","Himalaya — Wikimedia Commons","Mont Fuji — Subramaniam K V, Wikimedia Commons","Machu Picchu — PA, Wikimedia Commons"];
 const beforeSceneMarkup=sceneMarkup;
 sceneMarkup=function(n){return beforeSceneMarkup(n).replace('</div></div>','<small style="font-size:10px;opacity:.75;display:block;margin-top:6px">Photo : '+PHOTO_CREDITS[n]+'</small></div></div>')};
+</script><style>
+.lesson-lines{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.lesson-line{display:block;padding:12px 15px;background:#102f3b;border-left:3px solid #6fceb7;border-radius:8px;line-height:1.6}
+.lesson-line strong{display:block;color:#a8f0d9;margin-bottom:3px}
+.note.lesson-reformatted{white-space:normal!important}
+.note.lesson-reformatted .figurebox{margin:18px auto}
+.figurebox svg{display:block;margin:auto;max-width:440px}
+.figurebox small{display:block;line-height:1.5;margin:12px auto 0;max-width:400px}
+</style><script>
+const previousIntroClean=intro;
+intro=function(){previousIntroClean();const box=el.querySelector('.note');if(!box||!box.querySelector('h3'))return;
+const h=box.querySelector('h3'),p=box.querySelector('p'),fig=box.querySelector('.figurebox');
+if(!p)return;const course=p.textContent||'';
+const parts=course.replace(/^Cours\s*:\s*/i,'').split(/\.\s+(?=[A-ZÀ-Ÿ])/).map(x=>x.trim().replace(/\.$/,'')).filter(Boolean);
+const lines=document.createElement('div');lines.className='lesson-lines';
+for(let i=0;i<parts.length;i++){const item=document.createElement('div');item.className='lesson-line';const label=document.createElement('strong');label.textContent='Notion '+(i+1);const txt=document.createElement('span');txt.textContent=parts[i]+'.';item.append(label,txt);lines.append(item)}
+p.replaceWith(lines);box.classList.add('lesson-reformatted');
+if(fig){const ch=session.chapters[stage%session.chapters.length]||'';if(ch==='Triangles et quadrilatères'){fig.remove()}else if(ch==='Théorème de Pythagore'){fig.querySelector('small').textContent='Exemple de triangle rectangle en A : AB = 8 cm, AC = 6 cm, BC = 10 cm.'}}
+};
 </script></body></html>
