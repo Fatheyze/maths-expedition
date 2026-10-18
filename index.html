@@ -336,4 +336,20 @@ const beforeReliableResume=resume;
 resume=function(){if(!session){beforeReliableResume();return}const n=session.currentStage,i=session.currentQuestion;if(Number.isInteger(n)&&Number.isInteger(i)&&n>=0&&n<6&&n<=session.completed){stage=n;questions=Array.isArray(session.currentQuestions)&&session.currentQuestions.length?session.currentQuestions:makeStage(n);questionIndex=Math.min(Math.max(i,0),questions.length);attempts=0;started=Date.now();ask();return}beforeReliableResume()};
 const beforeReliableNext=next;
 next=function(){beforeReliableNext();if(session&&questionIndex<questions.length){session.currentStage=stage;session.currentQuestion=questionIndex;save()}};
+</script><script>
+/* Indices de réflexion : jamais la réponse demandée. */
+function pedagogicalHints(q){
+const t=(q.t||'').toLowerCase();
+if(/quel triangle possède un angle droit|triangle possède un angle droit|triangle.*angle droit|est.il rectangle/.test(t))return ['Il existe plusieurs familles de triangles. Certaines sont reconnues grâce aux longueurs de leurs côtés, d’autres grâce à leurs angles.','Pense aux trois familles étudiées : celle avec trois côtés égaux, celle avec deux côtés égaux, et celle caractérisée par un angle particulier. Associe chaque famille à sa propriété.'];
+if(/triangle isocèle|deux côtés|côtés de même longueur/.test(t))return ['Pour classer ce triangle, compare les longueurs de ses côtés.','Revois les familles de triangles : certaines sont définies par le nombre de côtés de même longueur. Identifie combien de côtés sont égaux ici.'];
+if(/équilatéral|trois côtés égaux|trois angles de 60/.test(t))return ['Compare les trois côtés ou les trois angles.','Distingue les triangles qui ont seulement deux côtés égaux de ceux qui en ont trois.'];
+if(/troisième angle|angles à la base|angle au sommet|chaque angle/.test(t))return ['Commence par écrire la somme des angles d’un triangle.','La somme des trois angles vaut 180°. Pour deux angles égaux, commence par déterminer leur somme, puis partage-la en deux.'];
+if(/peut.on construire|peut.il être construit/.test(t))return ['Compare la longueur du plus grand côté à celles des deux autres.','Pour construire un triangle, les deux plus petits côtés doivent pouvoir se rejoindre : leur somme doit dépasser le plus grand côté.'];
+if(/diamètre|rayon/.test(t))return ['Fais un schéma avec le centre du cercle et un segment passant par ce centre.','Le diamètre correspond à deux rayons alignés. Utilise cette relation pour calculer la longueur demandée.'];
+if(/parallèle|perpendiculaire|sécante|intersection/.test(t))return ['Imagine ou trace les deux droites. Se rencontrent-elles ?','Un angle droit est un angle de 90°. Pour distinguer les relations entre droites, regarde si elles se coupent et comment.'];
+if(/périmètre/.test(t))return ['Dessine mentalement le contour de la figure.','Pour obtenir la longueur du contour, additionne les longueurs de tous les côtés.'];
+return [q.hint&& !/réponse|solution/i.test(q.hint)?q.hint:'Quelle information de l’énoncé est vraiment utile ?', 'Cherche dans le cours la propriété qui relie les données de la question à ce qui est demandé. Écris-la avant de choisir ta réponse.'];
+}
+const beforePedagogicalAsk=ask;
+ask=function(){beforePedagogicalAsk();const q=questions[questionIndex],panel=el.querySelector('.panel');if(!q||!panel)return;const area=panel.querySelector('.method-support');if(!area)return;const hints=pedagogicalHints(q);const details=area.querySelectorAll('details');if(details[0]){const p=details[0].querySelector('p');if(p)p.textContent=hints[0]}if(details[1]){const nodes=[...details[1].querySelectorAll('p, .method-step')];nodes.forEach((node,i)=>{if(i===0)node.textContent=hints[1];else node.remove()})}};
 </script></body></html>
