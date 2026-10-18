@@ -70,4 +70,14 @@ function studentStart(){let first=document.getElementById('studentFirst').value.
 function home(){el.innerHTML='<div class="hero"><div><div class="eyebrow">Une aventure mathématique autour du monde</div><h1>Six destinations.<br>Une mission.</h1><p>Le professeur prépare la mission, puis les élèves la rejoignent avec un QR code. Six destinations, des défis et un coffre final.</p><div class="actions">'+btn('🎓 Préparer une mission','teacher()')+btn('🧪 Démonstration élève','demo()','secondary')+'</div></div><div class="earth">'+EARTH_SVG+'</div></div><div class="panel"><h3>📡 Le QG du professeur ZEGHOUDI</h3><p>Choisis la classe et les chapitres dans l’espace professeur, puis projette le QR code ou imprime les étiquettes. Les élèves ne choisissent pas le programme.</p></div>'}
 function demo(){let cfg=JSON.parse(localStorage.getItem('expeditionZ_teacher_config')||'null');if(!cfg){teacher();return}location.href=missionLink(cfg)}
 if(new URLSearchParams(location.search).get('mission')==='1')studentLanding();else home();
+</script><script>
+(function(){
+const params=new URLSearchParams(location.search);
+if(params.get('mission')==='1'){
+  const grade=params.get('niveau'),chapter=params.get('chapitre'),chapter2=params.get('chapitre2');
+  if(!C[grade]||!C[grade].includes(chapter)){studentLanding();return}
+  window.studentConfig={grade,chapters:[chapter,...(chapter2&&C[grade].includes(chapter2)&&chapter2!==chapter?[chapter2]:[])]};
+  studentLanding();
+}
+})();
 </script></body></html>
