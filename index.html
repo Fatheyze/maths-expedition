@@ -80,4 +80,71 @@ if(params.get('mission')==='1'){
   studentLanding();
 }
 })();
+</script><style>
+.lesson{background:#0b3142;border:1px solid #4a8592;border-radius:14px;padding:20px;margin:18px 0}.lesson h3{color:#7ce5c5}.figurebox{background:#f3f7f9;color:#173044;border-radius:14px;padding:16px;margin:14px auto;max-width:480px;text-align:center}.figurebox svg{width:100%;max-height:240px}.helpstep{border:1px solid #426e81;padding:12px;border-radius:10px;margin:10px 0}.answerfield{width:100%;margin:12px 0}.leveltag{background:#235365;border-radius:20px;padding:6px 12px;font-size:13px;color:#d8f8ee}.lesson p{white-space:pre-line}
+</style>
+<script>
+/* Banque pédagogique renforcée : 6e et 3e, distincte du générateur historique */
+const EDU={};
+function E(ch,entries,course,figure){EDU[ch]={entries,course,figure:figure||''}}
+const triFig='<div class="figurebox"><svg viewBox="0 0 400 230" xmlns="http://www.w3.org/2000/svg"><path d="M70 185 L320 185 L145 40 Z" fill="#d8f2ee" stroke="#116d7c" stroke-width="3"/><path d="M70 185 L100 185 L100 155" fill="none" stroke="#e28138" stroke-width="3"/><text x="55" y="201">A</text><text x="328" y="195">B</text><text x="140" y="30">C</text><text x="186" y="210">8 cm</text><text x="78" y="99">6 cm</text></svg><small>Schéma de travail : les mesures utiles sont précisées dans chaque énoncé.</small></div>';
+const rectangleFig='<div class="figurebox"><svg viewBox="0 0 400 210"><rect x="65" y="45" width="265" height="120" fill="#d8f2ee" stroke="#116d7c" stroke-width="3"/><text x="180" y="193" fill="#173044">Longueur L</text><text x="15" y="110" fill="#173044">l</text><path d="M65 145 h20 v20" fill="none" stroke="#e28138" stroke-width="3"/></svg><small>Rectangle : longueur L et largeur l.</small></div>';
+E('Triangles et quadrilatères',[
+['Un triangle possède deux angles de 50° et 60°. Quelle est la mesure du troisième angle ?',70,'La somme des trois angles vaut 180°.','180 − 50 − 60 = 70°','Angles'],
+['Un triangle a trois côtés de 4 cm, 4 cm et 7 cm. Quelle est sa nature ?','isocèle','Compare les longueurs des trois côtés.','Deux côtés égaux : triangle isocèle.','Classification',['équilatéral','rectangle','scalène']],
+['Un rectangle mesure 8 cm sur 5 cm. Quel est son périmètre, en cm ?',26,'Le périmètre est la somme des quatre côtés.','2 × (8 + 5) = 26 cm','Périmètre'],
+['Un quadrilatère a quatre angles droits. Quelle famille est certaine ?','rectangle','Un carré est aussi un rectangle.','Quatre angles droits définissent un rectangle.','Propriétés',['losange','trapèze','triangle']],
+['Dans un triangle isocèle, l’angle au sommet mesure 40°. Quelle est la mesure de chacun des angles à la base ?',70,'Les angles à la base sont égaux.','(180 − 40) ÷ 2 = 70°','Raisonnement'],
+['Un carré a un périmètre de 36 cm. Quelle est la longueur d’un côté ?',9,'Les quatre côtés ont la même longueur.','36 ÷ 4 = 9 cm','Problème inverse'],
+['Un triangle rectangle possède deux angles de 90° et 30°. Est-ce possible ?','non','La somme des angles est 180°.','Il resterait 60° mais 90 + 30 + 60 = 180 : attention, un triangle avec un angle de 90° et un de 30° est possible. Ici l’énoncé indique DEUX angles de 90° : impossible.','Analyse'],
+['Dans un parallélogramme, deux côtés consécutifs mesurent 7 cm et 4 cm. Périmètre ?',22,'Les côtés opposés sont égaux.','2 × (7 + 4) = 22 cm','Synthèse']
+],'Cours : triangle = trois côtés ; somme des angles = 180°. Triangle isocèle : deux côtés égaux et deux angles égaux. Triangle équilatéral : trois côtés égaux. Rectangle : quatre angles droits ; carré : quatre angles droits et quatre côtés égaux. Périmètre : additionner toutes les longueurs.',triFig);
+E('Nombres entiers et décimaux',[
+['Dans 27,305, quel chiffre est au rang des centièmes ?',0,'Les chiffres après la virgule sont dixièmes, centièmes, millièmes.','3 dixièmes, 0 centième, 5 millièmes.','Numération'],
+['Comparer 4,08 et 4,8. Quel est le plus grand ?','4,8','Écris 4,8 sous la forme 4,80.','4,80 est supérieur à 4,08.','Comparer',['4,08','égaux','impossible']],
+['Un explorateur parcourt 2,5 km le matin et 1,75 km l’après-midi. Distance totale, en km ?',4.25,'Aligne les virgules.','2,50 + 1,75 = 4,25 km.','Situation concrète'],
+['Quelle est la valeur de 6 × 0,1 ?',0.6,'Multiplier par 0,1 revient à diviser par 10.','6 × 0,1 = 0,6.','Sens des opérations'],
+['Une carte indique 12,6 km. Le groupe a déjà parcouru 8,75 km. Combien reste-t-il, en km ?',3.85,'Calcule 12,60 − 8,75.','12,60 − 8,75 = 3,85 km.','Problème'],
+['Quel nombre est exactement au milieu de 3,2 et 3,8 ?',3.5,'Calcule la moyenne des deux valeurs.','(3,2 + 3,8) ÷ 2 = 3,5.','Droite graduée'],
+['Quel est le résultat de 0,25 × 12 ?',3,'0,25 est un quart.','Le quart de 12 vaut 3.','Calcul réfléchi'],
+['Une bouteille de 1,5 L remplit des verres de 0,25 L. Combien de verres ?',6,'Divise le volume total par le volume d’un verre.','1,5 ÷ 0,25 = 6.','Problème à étapes']
+],'Cours : les nombres décimaux s’écrivent avec une partie entière et une partie décimale. Pour comparer, on peut ajouter des zéros à droite. Pour additionner ou soustraire, on aligne les virgules.');
+E('Arithmétique et nombres premiers',[
+['Le nombre 29 est-il premier ?','oui','Cherche ses diviseurs entiers autres que 1 et lui-même.','29 n’est divisible ni par 2, ni par 3, ni par 5.','Reconnaître'],
+['Quel est le plus petit diviseur premier de 91 ?',7,'Teste les nombres premiers 2, 3, 5 puis 7.','91 = 7 × 13.','Décomposition'],
+['Décompose 60 en facteurs premiers. Quel est l’exposant de 2 ?',2,'60 = 2 × 2 × 3 × 5.','60 = 2² × 3 × 5.','Factorisation'],
+['Deux équipes de 24 et 36 élèves doivent former des groupes identiques sans reste. Quel est le nombre maximal de groupes ?',12,'Cherche le PGCD de 24 et 36.','PGCD(24,36) = 12.','Problème de partage'],
+['Quel est le PGCD de 84 et 126 ?',42,'Décompose les deux nombres en facteurs premiers.','84 = 2² × 3 × 7 et 126 = 2 × 3² × 7 : PGCD = 42.','Raisonnement'],
+['Un signal clignote toutes les 12 s et un autre toutes les 18 s. Dans combien de secondes clignotent-ils ensemble ?',36,'Cherche le plus petit multiple commun.','PPCM(12,18) = 36 s.','Problème'],
+['Simplifie 84/126. Quel est le numérateur de la fraction irréductible ?',2,'Divise le numérateur et le dénominateur par leur PGCD.','84/126 = 2/3.','Fractions'],
+['Une école possède 96 stylos bleus et 120 rouges. On veut faire le maximum de lots identiques. Combien de lots ?',24,'Cherche le plus grand diviseur commun.','PGCD(96,120) = 24 lots, chacun avec 4 bleus et 5 rouges.','Synthèse']
+],'Cours : un nombre premier a exactement deux diviseurs positifs : 1 et lui-même. La décomposition en facteurs premiers permet de simplifier des fractions et de rechercher un PGCD ou un PPCM.');
+E('Théorème de Pythagore',[
+['Dans un triangle rectangle de côtés de l’angle droit 3 cm et 4 cm, quelle est l’hypoténuse ?',5,'Applique a² + b² = c².','3² + 4² = 25, donc c = 5 cm.','Application'],
+['Le carré de l’hypoténuse d’un triangle rectangle dont les côtés de l’angle droit mesurent 5 cm et 12 cm vaut ?',169,'Additionne les carrés des deux côtés.','25 + 144 = 169.','Méthode'],
+['Un triangle de côtés 6, 8 et 10 est-il rectangle ?','oui','Compare 6² + 8² à 10².','36 + 64 = 100 = 10².','Réciproque'],
+['Une échelle est posée à 6 m d’un mur et atteint 8 m de hauteur. Sa longueur en mètres ?',10,'Dessine le triangle rectangle.','√(6² + 8²) = 10 m.','Problème'],
+['Dans un triangle rectangle, l’hypoténuse mesure 13 cm et un côté 5 cm. L’autre côté mesure ?',12,'Soustrais les carrés.','√(13² − 5²) = √144 = 12 cm.','Calcul inverse'],
+['Un triangle a pour côtés 7, 10 et 12. Est-il rectangle ?','non','Compare 7² + 10² et 12².','149 ≠ 144 : il n’est pas rectangle.','Contraposée'],
+['Une pièce mesure 9 m sur 12 m. Longueur de la diagonale, en m ?',15,'La diagonale forme l’hypoténuse.','√(81 + 144) = √225 = 15 m.','Géométrie concrète'],
+['Une rampe monte de 1,5 m sur une distance horizontale de 2 m. Sa longueur, en m ?',2.5,'Pythagore et calculatrice autorisée.','√(1,5² + 2²) = √6,25 = 2,5 m.','Synthèse']
+],'Cours : dans un triangle rectangle, le carré de l’hypoténuse est la somme des carrés des deux autres côtés. Pour vérifier si un triangle est rectangle, comparer les carrés de ses trois longueurs.',triFig);
+E('Théorème de Thalès',[
+['Un segment de 4 cm est agrandi avec un coefficient 3. Sa nouvelle longueur ?',12,'Multiplie la longueur par le coefficient.','4 × 3 = 12 cm.','Rapports'],
+['Dans une configuration de Thalès, AM/AB = 2/5 et AB = 20 cm. AM vaut ?',8,'AM = 20 × 2/5.','AM = 8 cm.','Application'],
+['Deux triangles semblables ont des côtés correspondants de 6 cm et 15 cm. Quel est le coefficient du petit au grand ?',2.5,'15 ÷ 6.','15 ÷ 6 = 2,5.','Proportionnalité'],
+['Dans un triangle ABC, M est sur [AB], N sur [AC], MN // BC. Si AM = 3, AB = 9 et AC = 12, AN vaut ?',4,'AM/AB = AN/AC.','3/9 = AN/12, donc AN = 4.','Thalès'],
+['Avec AM = 4, AB = 10, AN = 6, AC = 15, les rapports sont-ils égaux ?','oui','Calcule 4/10 et 6/15.','0,4 = 0,4.','Réciproque'],
+['Une ombre de 2 m correspond à un objet de 3 m. Un arbre projette une ombre de 8 m. Sa hauteur, en m ?',12,'Les triangles formés par les rayons solaires sont semblables.','3/2 = h/8, donc h = 12 m.','Problème'],
+['Un plan au 1:250 représente un mur par 4 cm. Longueur réelle en mètres ?',10,'4 × 250 cm puis convertis en mètres.','1000 cm = 10 m.','Échelle'],
+['Dans une réduction de rapport 0,4, une longueur devient 14 cm. Longueur initiale ?',35,'Divise par 0,4.','14 ÷ 0,4 = 35 cm.','Synthèse']
+],'Cours : si (MN) est parallèle à (BC) dans un triangle ABC, avec M sur [AB] et N sur [AC], alors AM/AB = AN/AC = MN/BC. Il faut identifier correctement les côtés correspondants.',triFig);
+function enhancedBank(ch){const d=EDU[ch];if(!d)return null;return d.entries.map((e,i)=>{const [t,a,h,why,type,extra]=e;let correct=String(a);let opts=extra?[correct,...extra]:[correct,String(Number(a)+1),String(Number(a)-1),String(Number(a)+3)];if(opts.length<4)opts.push('impossible');return{t,a:correct,opts:mix([...new Set(opts)].slice(0,4)),hint:h,why,type,figure:d.figure,chapter:ch,difficulty:1+Math.floor(i/2)}})}
+const previousMakeStage=makeStage;
+makeStage=function(n){let result=[],chapters=session.chapters||[];for(let ch of chapters){let b=enhancedBank(ch);if(b){let begin=Math.min(n,Math.max(0,b.length-3));result.push(...b.slice(begin,begin+3))}else{let b=bank(ch,session.grade);result.push(...b.slice(0,3).map(q=>({...q,chapter:ch,figure:''})))}}
+result=result.map((q,i)=>({...q,t:q.t,chapter:q.chapter||chapters[i%chapters.length]}));return result.length?result:previousMakeStage(n)};
+const previousIntro=intro;
+intro=function(){previousIntro();const d=EDU[session.chapters[stage%session.chapters.length]];let box=document.querySelector('.note');if(box&&d){box.innerHTML='<h3>📘 Leçon · '+esc(session.chapters[stage%session.chapters.length])+'</h3><p>'+esc(d.course)+'</p>'+(d.figure||'')+'<p><b>Matériel :</b> brouillon et calculatrice autorisés.</p>'}}
+const previousAsk=ask;
+ask=function(){previousAsk();let q=questions[questionIndex];if(!q)return;let box=document.querySelector('.question');if(box&&q.figure)box.insertAdjacentHTML('afterend',q.figure);let detail=document.querySelector('details.note');if(detail&&q.hint){detail.innerHTML='<summary>💡 Aides progressives</summary><div class="helpstep"><button class="secondary" onclick="this.nextElementSibling.hidden=false">Indice 1 · Démarrer</button><p hidden>'+esc(q.hint)+'</p></div><div class="helpstep"><button class="secondary" onclick="this.nextElementSibling.hidden=false">Indice 2 · Méthode</button><p hidden>Identifie les données, écris la propriété ou l’opération, puis vérifie le résultat et son unité.</p></div>'}}
 </script></body></html>
