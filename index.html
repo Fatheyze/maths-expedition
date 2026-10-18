@@ -327,13 +327,13 @@ const beforeReliableIntro=intro;
 intro=function(){beforeReliableIntro();const panel=el.querySelector('.panel');if(!panel)return;const txt=[...panel.querySelectorAll('p')].find(p=>/Le professeur ZEGHOUDI valide ton passage|Chaque question peut demander une méthode différente/.test(p.textContent));if(txt&&/Chaque question/.test(txt.textContent))txt.textContent='Lis chaque question attentivement. Tu peux utiliser un brouillon, une calculatrice et les coups de pouce si nécessaire.'};
 const beforeReliableAsk=ask;
 ask=function(){beforeReliableAsk();const q=questions[questionIndex],panel=el.querySelector('.panel');if(!q||!panel)return;
-if(session){session.currentStage=stage;session.currentQuestion=questionIndex;save()}
+if(session){session.currentStage=stage;session.currentQuestion=questionIndex;session.currentQuestions=questions;save()}
 const d=panel.querySelector('.method-support');if(d){const hints=d.querySelectorAll('details');if(hints[1]){const steps=hints[1].querySelectorAll('.method-step');const title=hints[1].querySelector('summary');if(title)title.textContent='📘 Coup de pouce 2 · Comprendre la méthode';const sample=hints[1].querySelectorAll('p');if(sample.length){const last=sample[sample.length-1];const text=last.textContent||'';if(/Un triangle qui possède un angle droit est appelé un triangle rectangle/i.test(text)){last.textContent='Exemple : pour reconnaître un triangle particulier, observe d’abord ses angles et ses côtés.'}}}}
 };
 const beforeReliableComplete=complete;
-complete=function(){if(session){session.currentStage=null;session.currentQuestion=null;save()}beforeReliableComplete();const panel=el.querySelector('.panel');if(panel){const p=[...panel.querySelectorAll('p')].find(x=>/Le professeur ZEGHOUDI valide ton passage/.test(x.textContent));if(p)p.textContent='Bravo '+session.first+' ! Tu as terminé les défis de cette destination.'}};
+complete=function(){if(session){session.currentStage=null;session.currentQuestion=null;session.currentQuestions=null;save()}beforeReliableComplete();const panel=el.querySelector('.panel');if(panel){const p=[...panel.querySelectorAll('p')].find(x=>/Le professeur ZEGHOUDI valide ton passage/.test(x.textContent));if(p)p.textContent='Bravo '+session.first+' ! Tu as terminé les défis de cette destination.'}};
 const beforeReliableResume=resume;
-resume=function(){if(!session){beforeReliableResume();return}const n=session.currentStage,i=session.currentQuestion;if(Number.isInteger(n)&&Number.isInteger(i)&&n>=0&&n<6&&n<=session.completed){stage=n;questions=makeStage(n);questionIndex=Math.min(Math.max(i,0),questions.length);attempts=0;started=Date.now();ask();return}beforeReliableResume()};
+resume=function(){if(!session){beforeReliableResume();return}const n=session.currentStage,i=session.currentQuestion;if(Number.isInteger(n)&&Number.isInteger(i)&&n>=0&&n<6&&n<=session.completed){stage=n;questions=Array.isArray(session.currentQuestions)&&session.currentQuestions.length?session.currentQuestions:makeStage(n);questionIndex=Math.min(Math.max(i,0),questions.length);attempts=0;started=Date.now();ask();return}beforeReliableResume()};
 const beforeReliableNext=next;
 next=function(){beforeReliableNext();if(session&&questionIndex<questions.length){session.currentStage=stage;session.currentQuestion=questionIndex;save()}};
 </script></body></html>
