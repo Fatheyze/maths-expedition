@@ -8668,9 +8668,10 @@ const esc = x => String(x ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": 
 const B32 = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 const randCode = n => Array.from(crypto.getRandomValues(new Uint8Array(n)), b => B32[b % 32]).join("");
 function hash(str) { let h = 2166136261; for (const c of str) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+let nuageME = null; // synchronisation des données du professeur (missions récentes, derniers réglages)
 const store = {
   get: (k, d = null) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
-  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); if (k === "mexp_teacher_cfg") localStorage.setItem("mexp_cfg_maj", String(Date.now())); } catch (e) {} if (nuageME && (k === "mexp_missions" || k === "mexp_teacher_cfg")) nuageME.modifie(); },
 };
 const BASE = location.protocol === "https:" ? location.origin + location.pathname : "https://fatheyze.github.io/maths-expedition/";
 const perStage = cfg => (cfg.chapters.length > 1 ? 3 : 5);
@@ -8759,6 +8760,14 @@ function teacher() {
     <p class="mini">Une mission sur un chapitre : 5 défis par destination. Sur deux chapitres : 3 défis de chaque chapitre par destination.</p></div>
     ${hist.length ? `<div class="panel hist"><h3>Missions récentes</h3><p class="mini">Rouvre une mission pour revoir son QR code ou suivre les résultats. Les résultats restent disponibles sur le relais environ 12 heures après la séance.</p>${hist.slice(0, 8).map(h => `<button class="secondary" onclick='openMission(${JSON.stringify(h.code)})'>${esc(h.label ? h.label + " · " : "")}${esc(h.level)} · ${esc(h.chapters.join(" + "))} <span class="mini">· ${new Date(h.at).toLocaleDateString("fr-FR")} ${new Date(h.at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span></button>`).join("")}</div>` : ""}`;
   chapterSelects(last.chapters);
+  el.insertAdjacentHTML("beforeend", panneauNuage());
+}
+function panneauNuage(){
+  const s = nuageME ? nuageME.etat() : {msg:"", ok:null}, cle = nuageME && nuageME.jeton();
+  return `<div class="panel"><h3>☁ Synchronisation entre vos appareils</h3>
+    <p class="mini">Vos missions récentes et vos derniers réglages sont enregistrés dans votre dépôt privé « donnees-outils », comme vos autres outils : tous vos appareils se mettent à jour tout seuls. La clé est la même que pour vos autres outils ; si vous l'avez déjà saisie dans l'un d'eux sur ce navigateur, elle est reprise automatiquement.</p>
+    ${cle ? "" : `<label for="nuage-cle">Clé GitHub (jeton personnel)</label><input id="nuage-cle" type="password" autocomplete="off" placeholder="github_pat_…"><div class="actions"><button onclick="if($('nuage-cle').value.trim()){nuageME.enregistrerCle($('nuage-cle').value);teacher()}">Enregistrer et synchroniser</button></div>`}
+    <p class="mini" id="mexp-sync" style="font-weight:700;color:${s.ok === false ? "#ff9aa5" : s.ok ? "#7fe3a9" : "inherit"}">${esc(s.msg || (cle ? "Synchronisation en cours…" : "Synchronisation non configurée sur cet appareil."))}</p></div>`;
 }
 function chapterSelects(pre = []) {
   const lv = $("lv").value, list = CHAPTERS[lv];
@@ -9040,6 +9049,79 @@ function finalScreen() {
   }
   home();
 })();
+/* ===== Synchronisation automatique (dépôt privé donnees-outils, clé commune à tous les outils) ===== */
+function creerNuage(opt){
+  const CLE = "nuage-github-cle", K_SHA = opt.id + "-sync-sha", K_SALE = opt.id + "-sync-sale";
+  const depot = {owner:"Fatheyze", repo:"donnees-outils", path:opt.fichier};
+  const jeton = () => { try { return localStorage.getItem(CLE) || ""; } catch(e){ return ""; } };
+  const enc = s => { const o = new TextEncoder().encode(s); let r = ""; for (let i = 0; i < o.length; i += 0x8000) r += String.fromCharCode.apply(null, o.subarray(i, i + 0x8000)); return btoa(r); };
+  const dec = b => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g, "")), c => c.charCodeAt(0)));
+  const url = () => `https://api.github.com/repos/${depot.owner}/${depot.repo}`;
+  const entetes = () => ({"Authorization": "Bearer " + jeton().trim(), "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"});
+  const sale = () => { try { const v = localStorage.getItem(K_SALE); return v === null ? true : v === "1"; } catch(e){ return true; } };
+  const setSale = v => { try { localStorage.setItem(K_SALE, v ? "1" : "0"); } catch(e){} };
+  const erreur = st => st === 401 ? "GitHub refuse la clé (expirée ou mal copiée)." : st === 403 ? "cette clé n'a pas le droit d'écrire dans ce dépôt." : st === 404 ? "dépôt introuvable, ou la clé n'y a pas accès." : "erreur GitHub " + st + ".";
+  let enCours = false, relance = false, minuterie = null, priveOk = false, msg = "", ok = null;
+  const etat = (m, o) => { msg = m; ok = o; try { opt.etat && opt.etat(m, o); } catch(e){} };
+  async function synchroniser(){
+    if (!jeton()) { etat("Synchronisation non configurée sur cet appareil.", null); return; }
+    if (enCours) { relance = true; return; }
+    enCours = true; etat("Synchronisation en cours…", null);
+    try {
+      if (!priveOk){ const rd = await fetch(url() + "?t=" + Date.now(), {headers: entetes(), cache: "no-store"}); if (rd.status !== 200) throw new Error(erreur(rd.status)); if (!(await rd.json()).private) throw new Error("ce dépôt est public : envoi refusé pour protéger les données."); priveOk = true; }
+      for (let essai = 0; essai < 3; essai++){
+        const r = await fetch(url() + "/contents/" + encodeURIComponent(depot.path) + "?t=" + Date.now(), {headers: entetes(), cache: "no-store"});
+        let sha = null;
+        if (r.status === 200){
+          const j = await r.json(); sha = j.sha;
+          if (sha !== localStorage.getItem(K_SHA)){
+            const distant = JSON.parse(dec(j.content));
+            if (sale()) opt.appliquer(opt.fusionner(opt.lire(), distant)); else { opt.appliquer(distant); setSale(false); }
+            localStorage.setItem(K_SHA, sha);
+          }
+        } else if (r.status !== 404) throw new Error(erreur(r.status));
+        const heure = new Date().toLocaleTimeString("fr-FR", {hour: "2-digit", minute: "2-digit"});
+        if (!sale() || (!sha && opt.vide && opt.vide(opt.lire()))) { setSale(false); etat("Synchronisé à " + heure, true); return; }
+        const corps = {message: opt.nom + " : mise à jour du " + new Date().toLocaleString("fr-FR"), content: enc(JSON.stringify({...opt.lire(), version: 1, maj: new Date().toISOString()}))};
+        if (sha) corps.sha = sha;
+        const p = await fetch(url() + "/contents/" + encodeURIComponent(depot.path), {method: "PUT", headers: {...entetes(), "Content-Type": "application/json"}, body: JSON.stringify(corps)});
+        if (p.status === 200 || p.status === 201){ const o = await p.json(); localStorage.setItem(K_SHA, o.content.sha); setSale(false); etat("Synchronisé à " + heure, true); return; }
+        if (p.status === 409 || p.status === 422) continue;
+        throw new Error(erreur(p.status));
+      }
+      throw new Error("un autre appareil enregistre en même temps, réessayez.");
+    } catch(e){ etat("Synchronisation impossible : " + (e instanceof TypeError ? "pas de connexion à GitHub." : e.message) + " Vos données restent sur cet appareil.", false); }
+    finally { enCours = false; if (relance){ relance = false; synchroniser(); } }
+  }
+  const planifier = (d = 2000) => { if (!jeton()) return; clearTimeout(minuterie); minuterie = setTimeout(synchroniser, d); };
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") planifier(300); });
+  setInterval(() => { if (document.visibilityState === "visible") planifier(0); }, 120000);
+  if (jeton()) planifier(500);
+  return {
+    modifie(){ setSale(true); planifier(); },
+    synchroniser, jeton,
+    enregistrerCle(c){ try { localStorage.setItem(CLE, c.trim()); } catch(e){} priveOk = false; synchroniser(); },
+    effacerCle(){ try { localStorage.removeItem(CLE); } catch(e){} etat("Clé effacée de ce navigateur.", null); },
+    etat: () => ({msg, ok})
+  };
+}
+
+nuageME = creerNuage({
+  id: "mexp", fichier: "maths-expedition.json", nom: "Maths expédition",
+  lire: () => ({missions: store.get("mexp_missions", []), cfg: store.get("mexp_teacher_cfg", null), cfgMaj: +(localStorage.getItem("mexp_cfg_maj") || 0)}),
+  vide: o => !o.missions.length && !o.cfg,
+  fusionner: (l, d) => {
+    const m = new Map();
+    [...(d.missions || []), ...(l.missions || [])].forEach(x => { const y = m.get(x.code); if (!y || (x.at || 0) > (y.at || 0)) m.set(x.code, x); });
+    const plusRecent = (d.cfgMaj || 0) > (l.cfgMaj || 0);
+    return {missions: [...m.values()].sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 30), cfg: plusRecent ? d.cfg : l.cfg, cfgMaj: Math.max(d.cfgMaj || 0, l.cfgMaj || 0)};
+  },
+  appliquer: o => {
+    try { localStorage.setItem("mexp_missions", JSON.stringify(o.missions || [])); if (o.cfg) localStorage.setItem("mexp_teacher_cfg", JSON.stringify(o.cfg)); localStorage.setItem("mexp_cfg_maj", String(o.cfgMaj || 0)); } catch(e){}
+    if (document.getElementById("lv") && !T) teacher(); // l'espace professeur est affiché : on le rafraîchit
+  },
+  etat: (m, ok) => { const e = document.getElementById("mexp-sync"); if (e){ e.textContent = m; e.style.color = ok === false ? "#ff9aa5" : ok ? "#7fe3a9" : "inherit"; } }
+});
 </script>
 </body>
 </html>
